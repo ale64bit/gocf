@@ -29,7 +29,7 @@ func CreateSession(config GocfConfig) {
 	session = GocfSession{contest, task, input, output, timeLimit, memLimit, checker}
 	session.Save(config)
 
-	ioutil.WriteFile(config.WorkFile, []byte(FileTemplate(config, session)), os.ModePerm)
+	ioutil.WriteFile(config.WorkFile, []byte(GoTemplate(session)), os.ModePerm)
 	fmt.Println("done")
 }
 
@@ -58,12 +58,12 @@ func ListSession(config GocfConfig) {
 func PrintUsage() {
 	fmt.Println(`
 -----------------------------
-   ____        ____ _____ 
+   ____        ____ _____
   / ___| ___  / ___|  ___|
- | |  _ / _ \| |   | |_   
- | |_| | (_) | |___|  _|  
-  \____|\___/ \____|_|    
-				                           
+ | |  _ / _ \| |   | |
+ | |_| | (_) | |___|  _|
+  \____|\___/ \____|_|
+
 -----------------------------
 Usage: gocf <cmd> [args...]
 

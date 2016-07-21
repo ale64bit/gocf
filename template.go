@@ -1,6 +1,22 @@
 package main
 
-func FileTemplate(config GocfConfig, session GocfSession) string {
+func ioSetup(session GocfSession) string {
+	if session.Input == "*" {
+		return `  scanner = bufio.NewScanner(os.Stdin)
+  scanner.Split(bufio.ScanWords)
+  writer = bufio.NewWriter(os.Stdout)`
+	} else {
+		return `  fi, _ := os.Open("` + session.Input + `")
+	fo, _ := os.Create("` + session.Output + `")
+	scanner = bufio.NewScanner(fi)
+	scanner.Split(bufio.ScanWords)
+	writer = bufio.NewWriter(fo)
+	defer fi.Close()
+	defer fo.Close()`
+	}
+}
+
+func GoTemplate(session GocfSession) string {
 	return `package main
 
 import (
@@ -10,13 +26,7 @@ import (
 )
 
 func main() {
-	fi, _ := os.Open("` + session.Input + `")
-	fo, _ := os.Create("` + session.Output + `")
-	scanner = bufio.NewScanner(fi)
-	scanner.Split(bufio.ScanWords)
-	writer = bufio.NewWriter(fo)
-	defer fi.Close()
-	defer fo.Close()
+` + ioSetup(session) + `	
 	defer writer.Flush()
 
 	// TODO your code here
