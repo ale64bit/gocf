@@ -57,18 +57,23 @@ func ansPath(config GocfConfig, id int) string {
 	return config.SessionDir + "/" + strconv.Itoa(id) + ".ans"
 }
 
-func AddTest(config GocfConfig) {
+func AddTest(config GocfConfig, input, answer []byte) int {
+	id := firstAvailableId(config)
+	ioutil.WriteFile(inPath(config, id), input, os.ModePerm)
+	if len(answer) > 0 {
+		ioutil.WriteFile(ansPath(config, id), answer, os.ModePerm)
+	}
+	return id
+}
+
+func AddTestFromUser(config GocfConfig) {
 	session := LoadCurrentSession(config)
 	fmt.Println(session.String())
 	fmt.Println("\nEnter input:")
-	in, _ := ioutil.ReadAll(os.Stdin)
+	input, _ := ioutil.ReadAll(os.Stdin)
 	fmt.Println("\nEnter answer [empty if unknown]:")
-	ans, _ := ioutil.ReadAll(os.Stdin)
-	id := firstAvailableId(config)
-	ioutil.WriteFile(inPath(config, id), in, os.ModePerm)
-	if len(ans) > 0 {
-		ioutil.WriteFile(ansPath(config, id), ans, os.ModePerm)
-	}
+	answer, _ := ioutil.ReadAll(os.Stdin)
+	id := AddTest(config, input, answer)
 	fmt.Println("Added test #", id)
 }
 

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"net/url"
 	"os"
 	"strconv"
 )
@@ -20,8 +21,8 @@ func CreateSession(config GocfConfig) {
 	task := ReadDefault("Enter task name", DefaultTask)
 	input := ReadDefault("Enter input file name", DefaultInput)
 	output := ReadDefault("Enter output file name", DefaultOutput)
-	tl := ReadDefault("Enter time limit", DefaultTimeLimit)
-	ml := ReadDefault("Enter memory limit", DefaultMemLimit)
+	tl := ReadDefault("Enter time limit", strconv.Itoa(DefaultTimeLimit))
+	ml := ReadDefault("Enter memory limit", strconv.Itoa(DefaultMemLimit))
 	checker := ReadDefault("Enter task checker", DefaultChecker)
 
 	timeLimit, _ := strconv.Atoi(tl)
@@ -33,9 +34,35 @@ func CreateSession(config GocfConfig) {
 	fmt.Println("done")
 }
 
-func ImportSession(config GocfConfig, url string) {
-	// TODO
-	fmt.Println("Command is not implemented")
+func ImportSession(config GocfConfig, s string) {
+	session := LoadCurrentSession(config)
+	if Yes("Do you want to archive current session?") {
+		session.Archive(config, false)
+	}
+
+	os.RemoveAll(config.SessionDir)
+	os.MkdirAll(config.SessionDir, os.ModePerm)
+
+	u, _ := url.Parse(s)
+	switch u.Host {
+	case "codeforces.com":
+		session, inputs, answers, err := ImportCF(s)
+		if err != nil {
+			panic(err)
+		}
+		session.Save(config)
+		ioutil.WriteFile(config.WorkFile, []byte(GoTemplate(session)), os.ModePerm)
+
+		nrOfTests := len(inputs)
+		for id := 1; id <= nrOfTests; id++ {
+			ioutil.WriteFile(inPath(config, id), []byte(inputs[id-1]), os.ModePerm)
+			ioutil.WriteFile(ansPath(config, id), []byte(answers[id-1]), os.ModePerm)
+		}
+		fmt.Println("import successful")
+
+	default:
+		fmt.Println("Unsupported source:", u.Host)
+	}
 }
 
 func ArchiveSession(config GocfConfig) {
@@ -100,12 +127,13 @@ func main() {
 		CheckArgCount(0)
 		CreateSession(config)
 	case "import":
-		ImportSession(config, "url")
+		CheckArgCount(1)
+		ImportSession(config, os.Args[2])
 	case "test":
 		TestAll(config)
 	case "add":
 		CheckArgCount(0)
-		AddTest(config)
+		AddTestFromUser(config)
 	case "rm":
 		CheckArgCount(1)
 		id, _ := strconv.Atoi(os.Args[2])

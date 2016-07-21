@@ -24,19 +24,21 @@ const DefaultContest string = "practice"
 const DefaultTask string = "task"
 const DefaultInput string = "*"
 const DefaultOutput string = "*"
-const DefaultTimeLimit string = "1000"
-const DefaultMemLimit string = "67108864"
+const DefaultTimeLimit int = 1000
+const DefaultMemLimit int = 64 * (1 << 20)
 const DefaultChecker string = "*"
 const SolutionFile string = "__solution__"
 
-var DefaultSession GocfSession = GocfSession{
-	Contest:   "practice",
-	Task:      "task",
-	Input:     "*", // stdin
-	Output:    "*", // stdout
-	TimeLimit: 1000,
-	MemLimit:  64 * (1 << 20),
-	Checker:   "*", // default checker
+func DefaultSession() GocfSession {
+	return GocfSession{
+		Contest:   "practice",
+		Task:      "task",
+		Input:     "*", // stdin
+		Output:    "*", // stdout
+		TimeLimit: 1000,
+		MemLimit:  64 * (1 << 20),
+		Checker:   "*", // default checker
+	}
 }
 
 func (session GocfSession) String() string {
@@ -92,7 +94,7 @@ func LoadCurrentSession(config GocfConfig) GocfSession {
 	sessionFile := config.SessionDir + SessionFileName
 	var session GocfSession
 	if FileNotExist(sessionFile) {
-		session = DefaultSession
+		session = DefaultSession()
 		session.Save(config)
 	} else {
 		contents, _ := ioutil.ReadFile(sessionFile)
