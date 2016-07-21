@@ -65,7 +65,18 @@ func PrintUsage() {
   \____|\___/ \____|_|    
 				                           
 -----------------------------
-Usage: <TODO>`)
+Usage: gocf <cmd> [args...]
+
+where <cmd> is one of:
+  create                   - create a new session
+	import <url>             - create a new session from a supported url (e.g. Codeforces, Timus)
+	test                     - compile and run work file againts current tests
+	add                      - add a new test to current session
+	rm <id>                  - remove the test #id from current session
+	archive                  - archive current session
+	restore <contest> <task> - restore an archived session 
+	ls                       - list current session properties and tests
+`)
 }
 
 func CheckArgCount(exp int) {
