@@ -65,7 +65,7 @@ func readArchiveDir() string {
 
 func SaveConfig(conf GocfConfig) {
 	b, _ := json.Marshal(conf)
-	ioutil.WriteFile(ConfigFile, b, os.ModePerm)
+	ioutil.WriteFile(os.ExpandEnv(ConfigFile), b, os.ModePerm)
 }
 
 func LoadConfig() GocfConfig {
