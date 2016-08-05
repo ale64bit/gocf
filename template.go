@@ -44,6 +44,11 @@ func NextInt() int {
 	return ret
 }
 
+func NextFloat() float64 {
+	ret, _ := strconv.ParseFloat(Next(), 64)
+	return ret
+}
+
 func Next() string {
 	scanner.Scan()
 	return scanner.Text()
